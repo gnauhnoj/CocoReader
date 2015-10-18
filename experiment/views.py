@@ -12,13 +12,16 @@ anns = db["annotations"]
 images = db["images"]
 categories = db["categories"]
 
+
 # Create your views here.
 def index(request):
-    return HttpResponse("This is an experiment for COCO reader");
+    return HttpResponse("This is an experiment for COCO reader")
+
 
 def annotations(request):
     a = anns.find_one()
-    return HttpResponse(a);
+    return HttpResponse(a)
+
 
 def get_random_image(request):
     N_CAT = 3
@@ -30,10 +33,10 @@ def get_random_image(request):
     # image ids with either combination of the N_CAT categories
     img_ids = []
     for cat in sample_cats:
-        img_ids += list(anns.find({"category_id": cat},{"image_id": 1, "_id": 0}))
+        img_ids += list(anns.find({"category_id": cat}, {"image_id": 1, "_id": 0}))
 
     # pick a random image
-    rand_image_id = sample(img_ids,1)[0]['image_id']
+    rand_image_id = sample(img_ids, 1)[0]['image_id']
 
     img_anns = list(anns.find({"image_id": rand_image_id}))
     img = {}
@@ -44,7 +47,7 @@ def get_random_image(request):
     for ia in img_anns:
         bb = {}
         bb["category_id"] = ia["category_id"]
-        bb["category_name"] = categories.find_one({"id":ia["category_id"]})["name"]
+        bb["category_name"] = categories.find_one({"id": ia["category_id"]})["name"]
         bb["bbox"] = {}
         bb["bbox"]["x"] = ia["bbox"][0]
         bb["bbox"]["y"] = ia["bbox"][1]
