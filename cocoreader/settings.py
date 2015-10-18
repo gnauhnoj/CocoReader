@@ -54,10 +54,10 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    #'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    # 'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    #'django.middleware.security.SecurityMiddleware',
+    # 'django.middleware.security.SecurityMiddleware',
 )
 
 ROOT_URLCONF = 'cocoreader.urls'
@@ -84,22 +84,22 @@ WSGI_APPLICATION = 'cocoreader.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'cocoreader',
-        'USER': 'rohitjain',
-        'PASSWORD': 'rohitjain',  # Not used with sqlite3.
-        'HOST': '',  # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',  # Set to empty string for default. Not used with sqlite3.
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'cocoreader',
+#         'USER': 'rohitjain',
+#         'PASSWORD': 'rohitjain',  # Not used with sqlite3.
+#         'HOST': '',  # Set to empty string for localhost. Not used with sqlite3.
+#         'PORT': '',  # Set to empty string for default. Not used with sqlite3.
+#     }
+# }
 
 
 DATABASES = {
-       'default' : {
-           'ENGINE' : 'django_mongodb_engine',
-           'NAME' : 'coco'
+       'default': {
+           'ENGINE': 'django_mongodb_engine',
+           'NAME': 'coco'
        }
 }
 # Internationalization
@@ -122,9 +122,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # Parse database configuration from $DATABASE_URL
-import dj_database_url
-#DATABASE_URL = 'postgresql:///postgresql'
-#DATABASES['default'] =  dj_database_url.config()
+# import dj_database_url
+# DATABASE_URL = 'postgresql:///postgresql'
+# DATABASES['default'] =  dj_database_url.config()
 
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
