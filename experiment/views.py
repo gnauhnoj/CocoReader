@@ -59,6 +59,11 @@ def get_random_image(request):
         bb['bbox']['w'] = ia['bbox'][2]
         bb['bbox']['h'] = ia['bbox'][3]
         img['bboxes'] += [bb]
+        if ia['iscrowd'] is 0:
+            img['RLE'] = False
+        else:
+            img['RLE'] = True
+        img['segmentation'] = ia['segmentation']
 
     # alternatively we can just use the same bboxes object - but need to standardize
     # can add filters for score...
