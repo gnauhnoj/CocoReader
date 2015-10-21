@@ -87,6 +87,7 @@ def get_random_caption(caps):
     temp = {}
     temp['image_id'] = single_cap['image_id']
     temp['caption'] = single_cap['caption']
+    temp['caption_id'] = single_cap['id']
     return temp
 
 
@@ -95,7 +96,7 @@ def get_survey_options(request, img_id):
     results = []
 
     # good caption
-    good_caps = list(captions.find({'image_id': img_id}, {'caption': 1, 'image_id': 1}))
+    good_caps = list(captions.find({'image_id': img_id}, {'caption': 1, 'image_id': 1, 'id': 1}))
     results.append(get_random_caption(good_caps))
 
     # get captions
@@ -110,12 +111,12 @@ def get_survey_options(request, img_id):
     img_pool = [set([cat['image_id'] for cat in list(anns.find({'category_id': cat}, {'image_id': 1}))]) for cat in sample_cats]
     img_int = list(set.intersection(*img_pool))
     similar_caps_i = choice(img_int)
-    similar_caps = list(captions.find({'image_id': similar_caps_i}, {'caption': 1, 'image_id': 1}))
+    similar_caps = list(captions.find({'image_id': similar_caps_i}, {'caption': 1, 'image_id': 1, 'id': 1}))
     results.append(get_random_caption(similar_caps))
 
     # bad caption
     bad_cap_i = choice(list(anns.find({'category_id': {'$nin': cats}}, {'image_id': 1})))['image_id']
-    bad_caps = list(captions.find({'image_id': bad_cap_i}, {'caption': 1, 'image_id': 1}))
+    bad_caps = list(captions.find({'image_id': bad_cap_i}, {'caption': 1, 'image_id': 1, 'id': 1}))
     results.append(get_random_caption(bad_caps))
 
     # order is [good, similar, bad]
