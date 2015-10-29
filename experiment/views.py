@@ -124,9 +124,11 @@ def get_survey_options(request, img_id):
     return HttpResponse(json.dumps(results))
 
 
-def get_survey_image(request, cap_id):
-    cap_id = int(cap_id)
-    img_id = captions.find_one({'id': cap_id})['image_id']
+def get_survey_image(request, img_id):
+    # cap_id = int(cap_id)
+    # img_id = captions.find_one({'id': cap_id})['image_id']
+    # find the image filename using image id
+    img_id = int(img_id)
     img_loc = images.find_one({'id': img_id})['file_name']
     # return image location
-    return HttpResponse(json.dumps(img_loc))
+    return HttpResponse(json.dumps({"file_name":img_loc}))
