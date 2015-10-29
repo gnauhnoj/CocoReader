@@ -79,7 +79,7 @@ def get_random_image(request):
         bb['bbox']['a'] = io['bbox'][4]
         img['ocr'] += [bb]
 
-    return HttpResponse(json.dumps(n_cats))
+    return HttpResponse(json.dumps(img))
 
 
 def get_random_caption(caps):
