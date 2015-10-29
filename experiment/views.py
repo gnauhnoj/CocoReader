@@ -79,7 +79,7 @@ def get_random_image(request):
         bb['bbox']['a'] = io['bbox'][4]
         img['ocr'] += [bb]
 
-    return HttpResponse(json.dumps(img))
+    return HttpResponse(json.dumps(n_cats))
 
 
 def get_random_caption(caps):
@@ -105,7 +105,7 @@ def get_survey_options(request, img_id):
 
     # similar caption
     # alternatively, take a fraction of the cats...
-    N_CAT = 2
+    N_CAT = 2 if len(cats) > 1 else len(cats)
     sample_cats = sample(cats, N_CAT)
     # this is not efficient, probably can do this in mongo but confusing
     img_pool = [set([cat['image_id'] for cat in list(anns.find({'category_id': cat}, {'image_id': 1}))]) for cat in sample_cats]
@@ -131,4 +131,4 @@ def get_survey_image(request, img_id):
     img_id = int(img_id)
     img_loc = images.find_one({'id': img_id})['file_name']
     # return image location
-    return HttpResponse(json.dumps({"file_name":img_loc}))
+    return HttpResponse(json.dumps({"file_name": img_loc}))
