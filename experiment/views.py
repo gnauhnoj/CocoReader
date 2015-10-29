@@ -104,7 +104,6 @@ def get_survey_options(request, img_id):
     cats = list(set([annot['category_id'] for annot in cats]))
 
     # similar caption
-    # alternatively, take a fraction of the cats...
     N_CAT = 2 if len(cats) > 1 else len(cats)
     sample_cats = sample(cats, N_CAT)
     # this is not efficient, probably can do this in mongo but confusing
