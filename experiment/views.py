@@ -35,6 +35,7 @@ def build_img_dict(img_id):
     img['bboxes'] = []
     img['file_name'] = images.find_one({'id': img_id})['file_name']
     img['ocr'] = []
+    img['segmentation'] = []
 
     for ia in img_anns:
         bb = {}
@@ -51,11 +52,10 @@ def build_img_dict(img_id):
         else:
             img['RLE'] = True
         if (type(ia['segmentation']) == list):
-            img['segmentation'] = []
             for seg in ia['segmentation']:
-                img['segmentation'] += np.array(seg).reshape( (len(seg)/2) ,2 ).tolist()
+                img['segmentation'] += [np.array(seg).reshape( (len(seg)/2) ,2 ).tolist()]
         else:
-            img['segmentation'] = ia['segmentation']
+            img['segmentation'] += ia['segmentation']
 
     # alternatively we can just use the same bboxes object - but need to standardize
     # can add filters for score...
