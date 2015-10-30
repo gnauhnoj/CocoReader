@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from pymongo import MongoClient
 from random import sample, choice
 import json
+import numpy as np
 
 databaseName = 'coco'
 client = MongoClient('localhost', 27017)
@@ -49,7 +50,12 @@ def build_img_dict(img_id):
             img['RLE'] = False
         else:
             img['RLE'] = True
-        img['segmentation'] = ia['segmentation']
+        if (type(ia['segmentation']) == list):
+            img['segmentation'] = []
+            for seg in ia['segmentation']:
+                img['segmentation'] += np.array(seg).reshape( (len(seg)/2) ,2 ).tolist()
+        else:
+            img['segmentation'] = ia['segmentation']
 
     # alternatively we can just use the same bboxes object - but need to standardize
     # can add filters for score...
