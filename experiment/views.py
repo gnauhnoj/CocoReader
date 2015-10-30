@@ -51,9 +51,13 @@ def build_img_dict(img_id):
             img['RLE'] = False
         else:
             img['RLE'] = True
+        # type lilst means polygons
         if (type(ia['segmentation']) == list):
+            # a single object can have multiple polygons in case of overlap
+            # append each to the segmentation list with coordinates and category name
             for seg in ia['segmentation']:
-                img['segmentation'] += [np.array(seg).reshape( (len(seg)/2) ,2 ).tolist()]
+                # reshape to make list of (x,y) coordinates of the polygon
+                img['segmentation'] += [{ "points": np.array(seg).reshape( (len(seg)/2) ,2 ).tolist(), "category_name": bb['category_name'] }]
         else:
             img['segmentation'] += ia['segmentation']
 
