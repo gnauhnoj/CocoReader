@@ -25,28 +25,14 @@ def annotations(request):
     return HttpResponse(a)
 
 
-def get_random_image(request):
-    N_CAT = 3
-
-    # sample N_CAT categories
-    cats = anns.distinct('category_id')
-    sample_cats = sample(cats, N_CAT)
-
-    # image ids with either combination of the N_CAT categories
-    img_ids = []
-    for cat in sample_cats:
-        img_ids += list(anns.find({'category_id': cat}, {'image_id': 1, '_id': 0}))
-
-    # pick a random image
-    rand_image_id = sample(img_ids, 1)[0]['image_id']
-
-    img_anns = list(anns.find({'image_id': rand_image_id}))
-    img_ocr = list(ocr.find({'image_id': rand_image_id}))
+def build_img_dict(img_id):
+    img_anns = list(anns.find({'image_id': img_id}))
+    img_ocr = list(ocr.find({'image_id': img_id}))
 
     img = {}
-    img['image_id'] = rand_image_id
+    img['image_id'] = img_id
     img['bboxes'] = []
-    img['file_name'] = images.find_one({'id': rand_image_id})['file_name']
+    img['file_name'] = images.find_one({'id': img_id})['file_name']
     img['ocr'] = []
 
     for ia in img_anns:
@@ -78,7 +64,33 @@ def get_random_image(request):
         bb['bbox']['h'] = io['bbox'][3]
         bb['bbox']['a'] = io['bbox'][4]
         img['ocr'] += [bb]
+    return img
 
+
+def get_random_image(request):
+    N_CAT = 3
+
+    # sample N_CAT categories
+    cats = anns.distinct('category_id')
+    sample_cats = sample(cats, N_CAT)
+
+    # image ids with either combination of the N_CAT categories
+    img_ids = []
+    for cat in sample_cats:
+        img_ids += list(anns.find({'category_id': cat}, {'image_id': 1, '_id': 0}))
+
+    # pick a random image
+    rand_image_id = sample(img_ids, 1)[0]['image_id']
+    img = build_img_dict(rand_image_id)
+
+    return HttpResponse(json.dumps(img))
+
+
+def get_random_ocr(request):
+    # sample OCR
+    ocr_imgs = ocr.distinct('image_id')
+    rand_image_id = sample(ocr_imgs, 1)[0]
+    img = build_img_dict(rand_image_id)
     return HttpResponse(json.dumps(img))
 
 
