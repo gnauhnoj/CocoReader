@@ -1,7 +1,10 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from pymongo import MongoClient
-from random import sample, choice
+from random import sample, choice, shuffle
+from view_helpers import build_img_dict, get_random_caption
+from django.views.decorators.csrf import csrf_exempt
+import models
 import json
 import numpy as np
 
@@ -14,6 +17,7 @@ images = db['images']
 categories = db['categories']
 captions = db['captions']
 ocr = db['ocr']
+users = db['experiment_user']
 
 
 # Create your views here.
@@ -24,57 +28,6 @@ def index(request):
 def annotations(request):
     a = anns.find_one()
     return HttpResponse(a)
-
-
-def build_img_dict(img_id):
-    img_anns = list(anns.find({'image_id': img_id}))
-    img_ocr = list(ocr.find({'image_id': img_id}))
-
-    img = {}
-    img['image_id'] = img_id
-    img['bboxes'] = []
-    img['file_name'] = images.find_one({'id': img_id})['file_name']
-    img['ocr'] = []
-    img['segmentation'] = []
-
-    for ia in img_anns:
-        bb = {}
-        bb['category_id'] = ia['category_id']
-        bb['category_name'] = categories.find_one({'id': ia['category_id']})['name']
-        bb['bbox'] = {}
-        bb['bbox']['x'] = ia['bbox'][0]
-        bb['bbox']['y'] = ia['bbox'][1]
-        bb['bbox']['w'] = ia['bbox'][2]
-        bb['bbox']['h'] = ia['bbox'][3]
-        img['bboxes'] += [bb]
-        if ia['iscrowd'] is 0:
-            img['RLE'] = False
-        else:
-            img['RLE'] = True
-        # type lilst means polygons
-        if (type(ia['segmentation']) == list):
-            # a single object can have multiple polygons in case of overlap
-            # append each to the segmentation list with coordinates and category name
-            for seg in ia['segmentation']:
-                # reshape to make list of (x,y) coordinates of the polygon
-                img['segmentation'] += [{ "points": np.array(seg).reshape( (len(seg)/2) ,2 ).tolist(), "category_name": bb['category_name'] }]
-        else:
-            img['segmentation'] += ia['segmentation']
-
-    # alternatively we can just use the same bboxes object - but need to standardize
-    # can add filters for score...
-    for io in img_ocr:
-        bb = {}
-        bb['string'] = io['utf8_string']
-        bb['score'] = io['score']
-        bb['bbox'] = {}
-        bb['bbox']['x'] = io['bbox'][0]
-        bb['bbox']['y'] = io['bbox'][1]
-        bb['bbox']['w'] = io['bbox'][2]
-        bb['bbox']['h'] = io['bbox'][3]
-        bb['bbox']['a'] = io['bbox'][4]
-        img['ocr'] += [bb]
-    return img
 
 
 def get_random_image(request):
@@ -91,7 +44,7 @@ def get_random_image(request):
 
     # pick a random image
     rand_image_id = sample(img_ids, 1)[0]['image_id']
-    img = build_img_dict(rand_image_id)
+    img = build_img_dict(rand_image_id, anns, ocr, images, categories)
 
     return HttpResponse(json.dumps(img))
 
@@ -100,17 +53,8 @@ def get_random_ocr(request):
     # sample OCR
     ocr_imgs = ocr.distinct('image_id')
     rand_image_id = sample(ocr_imgs, 1)[0]
-    img = build_img_dict(rand_image_id)
+    img = build_img_dict(rand_image_id, anns, ocr, images, categories)
     return HttpResponse(json.dumps(img))
-
-
-def get_random_caption(caps):
-    single_cap = choice(caps)
-    temp = {}
-    temp['image_id'] = single_cap['image_id']
-    temp['caption'] = single_cap['caption']
-    temp['caption_id'] = single_cap['id']
-    return temp
 
 
 def get_survey_options(request, img_id):
@@ -139,6 +83,7 @@ def get_survey_options(request, img_id):
     bad_cap_i = choice(list(anns.find({'category_id': {'$nin': cats}}, {'image_id': 1})))['image_id']
     bad_caps = list(captions.find({'image_id': bad_cap_i}, {'caption': 1, 'image_id': 1, 'id': 1}))
     results.append(get_random_caption(bad_caps))
+    shuffle(results)
 
     # order is [good, similar, bad]
     # do query for imgs - need some heuristic
@@ -153,3 +98,38 @@ def get_survey_image(request, img_id):
     img_loc = images.find_one({'id': img_id})['file_name']
     # return image location
     return HttpResponse(json.dumps({"file_name": img_loc}))
+
+
+def get_user_score(request, username):
+    try:
+        user = models.User.objects.get(username=username)
+    except models.User.DoesNotExist:
+        user = models.User(username=username)
+        user.save()
+    out = {
+        'username': user.username,
+        'score': user.score
+    }
+    return HttpResponse(json.dumps(out))
+
+
+@csrf_exempt
+def update_score(request, username):
+    score = request.POST.get('score', False)
+    try:
+        user = models.User.objects.get(username=username)
+    except models.User.DoesNotExist:
+        raise Http404()
+    user.score += int(score)
+    user.save()
+    out = {
+        'username': user.username,
+        'score': user.score
+    }
+    return HttpResponse(json.dumps(out))
+
+
+def get_leaderboard(request):
+    top_users = list(users.find().sort([('score', -1)]).limit(10))
+    top_users = [{'username': user['username'], 'score': user['score']} for user in top_users]
+    return HttpResponse(json.dumps(top_users))
