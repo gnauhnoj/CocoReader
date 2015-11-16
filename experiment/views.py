@@ -115,7 +115,7 @@ def get_user_score(request, username):
 
 @csrf_exempt
 def update_score(request, username):
-    score = request.POST.get('score', False)
+    score = request.POST.get('score')
     try:
         user = models.User.objects.get(username=username)
     except models.User.DoesNotExist:
@@ -133,3 +133,24 @@ def get_leaderboard(request):
     top_users = list(users.find().sort([('score', -1)]).limit(10))
     top_users = [{'username': user['username'], 'score': user['score']} for user in top_users]
     return HttpResponse(json.dumps(top_users))
+
+
+@csrf_exempt
+def record_outcome(request):
+    username = request.POST.get('username')
+    image_id = int(request.POST.get('image_id'))
+    captions_used = int(request.POST.get('captions_used'))
+    outcome = request.POST.get('outcome') == 'True'
+    try:
+        user = models.User.objects.get(username=username)
+    except models.User.DoesNotExist:
+        raise Http404()
+    image_user = models.ImageUser(username=username, image_id=image_id, captions_used=captions_used, outcome=outcome)
+    image_user.save()
+    out = {
+        'username': image_user.username,
+        'image_id': image_user.image_id,
+        'captions_used': image_user.captions_used,
+        'outcome': image_user.outcome,
+    }
+    return HttpResponse(json.dumps(out))

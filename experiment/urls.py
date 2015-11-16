@@ -12,4 +12,5 @@ urlpatterns = [
     url(r'^getscore/(?P<username>\w{0,50})/$', views.get_user_score, name='getscore'),
     url(r'^updatescore/(?P<username>\w{0,50})/$', views.update_score, name='updatescore'),
     url(r'^leaderboard/$', views.get_leaderboard, name='leaderboard'),
+    url(r'^recordoutcome/$', views.record_outcome, name='recordoutcome'),
 ]
