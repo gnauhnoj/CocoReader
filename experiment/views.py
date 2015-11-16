@@ -141,16 +141,18 @@ def record_outcome(request):
     image_id = int(request.POST.get('image_id'))
     captions_used = int(request.POST.get('captions_used'))
     outcome = request.POST.get('outcome') == 'True'
+    double_used = request.POST.get('double_used')
     try:
         user = models.User.objects.get(username=username)
     except models.User.DoesNotExist:
         raise Http404()
-    image_user = models.ImageUser(username=username, image_id=image_id, captions_used=captions_used, outcome=outcome)
+    image_user = models.ImageUser(username=username, image_id=image_id, captions_used=captions_used, outcome=outcome, double_used=double_used)
     image_user.save()
     out = {
         'username': image_user.username,
         'image_id': image_user.image_id,
         'captions_used': image_user.captions_used,
         'outcome': image_user.outcome,
+        'double_used': image_user.double_used
     }
     return HttpResponse(json.dumps(out))
