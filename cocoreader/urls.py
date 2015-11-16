@@ -20,7 +20,7 @@ from rest_framework import routers, serializers, viewsets
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
+    # url(r'^admin/', include(admin.site.urls)),
     url(r'^experiment/', include('experiment.urls')),
 ]
 urlpatterns += staticfiles_urlpatterns()

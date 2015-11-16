@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from pymongo import MongoClient
 from random import sample, choice, shuffle
 from view_helpers import build_img_dict, get_random_caption
@@ -119,7 +119,7 @@ def update_score(request, username):
     try:
         user = models.User.objects.get(username=username)
     except models.User.DoesNotExist:
-        raise Http404()
+        raise Http404('Something went wrong. Contact admin.')
     user.score += int(score)
     user.save()
     out = {
@@ -145,7 +145,7 @@ def record_outcome(request):
     try:
         user = models.User.objects.get(username=username)
     except models.User.DoesNotExist:
-        raise Http404()
+        raise Http404('Something went wrong. Contact admin.')
     image_user = models.ImageUser(username=username, image_id=image_id, captions_used=captions_used, outcome=outcome, double_used=double_used)
     image_user.save()
     out = {
