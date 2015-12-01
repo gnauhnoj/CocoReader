@@ -22,7 +22,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '^5gbfm9i=7v-9#o4r^r$f!6wrmyqjqhmgxw@9@=s6a%i)ublw$'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+TEMPLATE_DEBUG = DEBUG
+ALLOWED_HOSTS = ['52.23.233.225', 'ec2-52-23-233-225.compute-1.amazonaws.com']
 
 ALLOWED_HOSTS = []
 
@@ -93,7 +95,6 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
-STATIC_URL = '/static/'
 
 # Parse database configuration from $DATABASE_URL
 # import dj_database_url
