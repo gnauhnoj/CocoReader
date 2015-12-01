@@ -113,7 +113,7 @@ def get_user_score(request, username):
     return HttpResponse(json.dumps(out))
 
 
-@csrf_exempt
+# @csrf_exempt
 def update_score(request, username):
     score = request.POST.get('score')
     try:
@@ -135,7 +135,7 @@ def get_leaderboard(request):
     return HttpResponse(json.dumps(top_users))
 
 
-@csrf_exempt
+# @csrf_exempt
 def record_outcome(request):
     username = request.POST.get('username')
     image_id = int(request.POST.get('image_id'))

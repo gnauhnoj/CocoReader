@@ -27,7 +27,7 @@ def build_img_dict(img_id, anns, ocr, images, categories):
             img['RLE'] = False
         else:
             img['RLE'] = True
-        # type lilst means polygons
+        # type list means polygons
         if (type(ia['segmentation']) == list):
             # a single object can have multiple polygons in case of overlap
             # append each to the segmentation list with coordinates and category name
