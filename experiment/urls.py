@@ -13,4 +13,5 @@ urlpatterns = [
     url(r'^updatescore/(?P<username>\w{0,50})/$', views.update_score, name='updatescore'),
     url(r'^leaderboard/$', views.get_leaderboard, name='leaderboard'),
     url(r'^recordoutcome/$', views.record_outcome, name='recordoutcome'),
+    url(r'^getnextuser/$', views.get_next_user_num, name='getnextuser'),
 ]

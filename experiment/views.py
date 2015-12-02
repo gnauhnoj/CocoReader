@@ -145,7 +145,10 @@ def record_outcome(request):
     try:
         user = models.User.objects.get(username=username)
     except models.User.DoesNotExist:
-        raise Http404('Something went wrong. Contact admin.')
+        # raise Http404('Something went wrong. Contact admin.')
+        # TODO: change back once leaderboard is built out on client-side
+        user = models.User(username=username)
+        user.save()
     image_user = models.ImageUser(username=username, image_id=image_id, captions_used=captions_used, outcome=outcome, double_used=double_used)
     image_user.save()
     out = {
@@ -156,3 +159,8 @@ def record_outcome(request):
         'double_used': image_user.double_used
     }
     return HttpResponse(json.dumps(out))
+
+
+def get_next_user_num(request):
+    out = str(users.count())
+    return HttpResponse(out)
