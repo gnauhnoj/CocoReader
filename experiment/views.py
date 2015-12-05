@@ -7,6 +7,9 @@ from django.views.decorators.csrf import csrf_exempt
 import models
 import json
 import numpy as np
+import logging
+
+logger = logging.getLogger(__name__)
 
 databaseName = 'coco'
 client = MongoClient('localhost', 27017)
@@ -162,5 +165,6 @@ def record_outcome(request):
 
 
 def get_next_user_num(request):
+    logger.debug("this is a debug message!")
     out = str(users.count())
     return HttpResponse(out)
