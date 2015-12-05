@@ -140,7 +140,7 @@ def record_outcome(request):
     username = request.POST.get('username')
     image_id = int(request.POST.get('image_id'))
     captions_used = int(request.POST.get('captions_used'))
-    outcome = request.POST.get('outcome') == 'True'
+    outcome = request.POST.get('outcome') == 'true'
     double_used = request.POST.get('double_used')
     try:
         user = models.User.objects.get(username=username)
