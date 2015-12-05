@@ -25,7 +25,9 @@ except:
     SECRET_KEY = '^5gbfm9i=7v-9#o4r^r$f!6wrmyqjqhmgxw@9@=s6a%i)ublw$'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+TEMPLATE_DEBUG = DEBUG
+ALLOWED_HOSTS = ['52.23.233.225', 'ec2-52-23-233-225.compute-1.amazonaws.com']
 
 # Application definition
 INSTALLED_APPS = (
