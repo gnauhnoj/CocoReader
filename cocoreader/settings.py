@@ -127,6 +127,10 @@ LOGGING = {
             'handlers': ['file'],
             'level': 'DEBUG',
         },
+        'experiment': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+        },
     }
 }
 
@@ -145,7 +149,7 @@ USE_TZ = True
 # import dj_database_url
 
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Allow all host headers
 # ALLOWED_HOSTS = ['*']

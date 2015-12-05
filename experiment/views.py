@@ -165,6 +165,5 @@ def record_outcome(request):
 
 
 def get_next_user_num(request):
-    logger.debug("this is a debug message!")
     out = str(users.count())
     return HttpResponse(out)
