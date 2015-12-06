@@ -63,7 +63,7 @@ def get_survey_options(request, img_id):
 
     # good caption
     good_caps = list(captions.find({'image_id': img_id}, {'caption': 1, 'image_id': 1, 'id': 1}))
-    results.append(get_random_caption(good_caps))
+    results.append((get_random_caption(good_caps), 2))
 
     # get captions
     cats = anns.find({'image_id': img_id}, {'category_id': 1})
@@ -77,12 +77,12 @@ def get_survey_options(request, img_id):
     img_int = list(set.intersection(*img_pool))
     similar_caps_i = choice(img_int)
     similar_caps = list(captions.find({'image_id': similar_caps_i}, {'caption': 1, 'image_id': 1, 'id': 1}))
-    results.append(get_random_caption(similar_caps))
+    results.append((get_random_caption(similar_caps), 1))
 
     # bad caption
     bad_cap_i = choice(list(anns.find({'category_id': {'$nin': cats}}, {'image_id': 1})))['image_id']
     bad_caps = list(captions.find({'image_id': bad_cap_i}, {'caption': 1, 'image_id': 1, 'id': 1}))
-    results.append(get_random_caption(bad_caps))
+    results.append((get_random_caption(bad_caps), 0))
     shuffle(results)
 
     # order is [good, similar, bad]
@@ -135,28 +135,55 @@ def get_leaderboard(request):
     return HttpResponse(json.dumps(top_users))
 
 
+def update_score_helper(username, caption_type, image_outcome):
+    # +1 point if get_survey_options[1] != 0
+    # +1 point if get_survey_options[1] != 0 && get_survey_image == get_random_image && answer is yes
+    try:
+        user = models.User.objects.get(username=username)
+    except models.User.DoesNotExist:
+        raise Http404('Something went wrong. Contact admin.')
+    score = 0
+    if caption_type != 0:
+        score += 1
+        if image_outcome:
+            score += 1
+    user.score += score
+    user.save()
+    return score
+
+
 # @csrf_exempt
 def record_outcome(request):
     username = request.POST.get('username')
     image_id = int(request.POST.get('image_id'))
     captions_used = int(request.POST.get('captions_used'))
-    outcome = request.POST.get('outcome') == 'true'
-    double_used = request.POST.get('double_used')
+    double_used = int(request.POST.get('double_used'))
+
+    caption_type = request.POST.get('caption_type')
+    caption_image_id = int(request.POST.get('caption_image_id'))
+    image_response = request.POST.get('image_response')
+    caption_outcome = (caption_image_id == image_id)
+    # TODO: what should image_response be
+    image_outcome = (image_response == 'true') and caption_outcome
+
     try:
         user = models.User.objects.get(username=username)
     except models.User.DoesNotExist:
-        # raise Http404('Something went wrong. Contact admin.')
+        # raise Http404('Somethingg went wrong. Contact admin.')
         # TODO: change back once leaderboard is built out on client-side
         user = models.User(username=username)
         user.save()
-    image_user = models.ImageUser(username=username, image_id=image_id, captions_used=captions_used, outcome=outcome, double_used=double_used)
+    image_user = models.ImageUser(username=username, image_id=image_id, captions_used=captions_used, caption_outcome=caption_outcome, double_used=double_used, image_outcome=image_outcome)
     image_user.save()
+    score = update_score_helper(username, int(caption_type), image_outcome)
     out = {
         'username': image_user.username,
         'image_id': image_user.image_id,
         'captions_used': image_user.captions_used,
-        'outcome': image_user.outcome,
-        'double_used': image_user.double_used
+        'caption_outcome': image_user.caption_outcome,
+        'image_outcome': image_user.image_outcome,
+        'double_used': image_user.double_used,
+        'score': score
     }
     return HttpResponse(json.dumps(out))
 
