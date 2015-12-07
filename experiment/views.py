@@ -151,7 +151,8 @@ def update_score_helper(username, caption_type, image_outcome):
                 score += 1
         print 'score: ', score
         print 'user', user.score
-        user.score += score
+        user.score = int(user.score) + score
+        print 'user', user.score
         user.save()
     except models.User.DoesNotExist:
         raise Http404('Something went wrong. Contact admin.')
