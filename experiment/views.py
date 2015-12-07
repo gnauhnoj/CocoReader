@@ -141,19 +141,20 @@ def get_leaderboard(request):
 def update_score_helper(username, caption_type, image_outcome):
     # +1 point if get_survey_options[1] != 0
     # +1 point if get_survey_options[1] != 0 && get_survey_image == get_random_image && answer is yes
+    logger.debug('user: ', username)
     try:
         user = models.User.objects.get(username=username)
+        score = 0
+        if caption_type != 0:
+            score += 1
+            if image_outcome:
+                score += 1
+        logger.debug('score: ', score)
+        logger.debug('user', user.score)
+        user.score += score
+        user.save()
     except models.User.DoesNotExist:
         raise Http404('Something went wrong. Contact admin.')
-    score = 0
-    if caption_type != 0:
-        score += 1
-        if image_outcome:
-            score += 1
-    logger.debug('score: ', score)
-    logger.debug('user', user.score)
-    user.score += score
-    user.save()
     return score
 
 
