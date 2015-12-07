@@ -151,7 +151,7 @@ def update_score_helper(username, caption_type, image_outcome):
         if image_outcome:
             score += 1
     logger.debug('score: ', score)
-    logger.debug('user', user)
+    logger.debug('user', user.score)
     user.score += score
     user.save()
     return score
