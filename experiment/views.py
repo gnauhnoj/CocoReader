@@ -141,7 +141,7 @@ def get_leaderboard(request):
 def update_score_helper(username, caption_type, image_outcome):
     # +1 point if get_survey_options[1] != 0
     # +1 point if get_survey_options[1] != 0 && get_survey_image == get_random_image && answer is yes
-    logger.debug('user: ', username)
+    print 'user: ', username
     try:
         user = models.User.objects.get(username=username)
         score = 0
@@ -149,8 +149,8 @@ def update_score_helper(username, caption_type, image_outcome):
             score += 1
             if image_outcome:
                 score += 1
-        logger.debug('score: ', score)
-        logger.debug('user', user.score)
+        print 'score: ', score
+        print 'user', user.score
         user.score += score
         user.save()
     except models.User.DoesNotExist:
