@@ -135,7 +135,7 @@ def get_leaderboard(request):
     return HttpResponse(json.dumps(top_users))
 
 
-def update_score_helper(username, caption_type, image_outcome):
+def update_score_helper(username, caption_type, image_outcome, image_response, caption_outcome):
     # +1 point if get_survey_options[1] != 0
     # +1 point if get_survey_options[1] != 0 && get_survey_image == get_random_image && answer is yes
     try:
@@ -146,6 +146,8 @@ def update_score_helper(username, caption_type, image_outcome):
     if caption_type != 0:
         score += 1
         if image_outcome:
+            score += 1
+        elif image_response == 'false' and not caption_outcome:
             score += 1
     user.score += score
     user.save()
@@ -175,7 +177,7 @@ def record_outcome(request):
         user.save()
     image_user = models.ImageUser(username=username, image_id=image_id, captions_used=captions_used, caption_outcome=caption_outcome, double_used=double_used, image_outcome=image_outcome)
     image_user.save()
-    score = update_score_helper(username, int(caption_type), image_outcome)
+    score = update_score_helper(username, int(caption_type), image_outcome, image_response, caption_outcome)
     out = {
         'username': image_user.username,
         'image_id': image_user.image_id,
