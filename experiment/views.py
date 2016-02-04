@@ -33,20 +33,46 @@ def annotations(request):
     return HttpResponse(a)
 
 
+def get_fixed_image_set(request):
+    FIXED_IMG_IDS = [42492, 95474, 439427, 103035, 323515,
+                     14297, 333440, 409042, 340478, 205811]
+    imgs_out = []
+
+    for iid in FIXED_IMG_IDS:
+        img = build_img_dict(iid, anns, ocr, images, categories)
+        imgs_out.append(img)
+
+    return HttpResponse(json.dumps(imgs_out))
+
+
 def get_random_image(request):
-    N_CAT = 3
-
-    # sample N_CAT categories
+    # we can change this
+    N_CAT = 2
     cats = anns.distinct('category_id')
-    sample_cats = sample(cats, N_CAT)
-
-    # image ids with either combination of the N_CAT categories
     img_ids = []
-    for cat in sample_cats:
-        img_ids += list(anns.find({'category_id': cat}, {'image_id': 1, '_id': 0}))
 
-    # pick a random image
-    rand_image_id = sample(img_ids, 1)[0]['image_id']
+    while len(img_ids) == 0:
+        # sample N_CAT categories
+        sample_cats = sample(cats, N_CAT)
+
+        # image ids with either combination of the N_CAT categories
+        img_pool = []
+        for cat in sample_cats:
+            img_ids = anns.find({'category_id': cat}, {'image_id': 1, '_id': 0})
+            img_ids = [img_id['image_id'] for img_id in img_ids]
+            img_pool.append(set(img_ids))
+
+        img_ids = set(img_pool[0])
+        # print img_ids
+        for i, k in enumerate(img_pool):
+            if i == 0:
+                continue
+            img_ids = img_ids.intersection(img_pool[i])
+            # print img_ids
+        img_ids = list(img_ids)
+
+    # pick a random images
+    rand_image_id = sample(img_ids, 1)[0]
     img = build_img_dict(rand_image_id, anns, ocr, images, categories)
 
     return HttpResponse(json.dumps(img))

@@ -14,4 +14,5 @@ urlpatterns = [
     url(r'^leaderboard/$', views.get_leaderboard, name='leaderboard'),
     url(r'^recordoutcome$', views.record_outcome, name='recordoutcome'),
     url(r'^getnextuser/$', views.get_next_user_num, name='getnextuser'),
+    url(r'^getfixedset/$', views.get_fixed_image_set, name='getfixedset'),
 ]
