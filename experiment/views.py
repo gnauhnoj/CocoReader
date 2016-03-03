@@ -178,6 +178,8 @@ def update_score_helper(username, caption_type, image_outcome, image_response, c
             score += 1
         elif image_response == 'false' and not caption_outcome:
             score += 1
+        elif image_outcome is None and image_response is None and caption_outcome:
+            score += 1
     user.score += score
     user.save()
     return score
@@ -213,6 +215,37 @@ def record_outcome(request):
         'captions_used': image_user.captions_used,
         'caption_outcome': image_user.caption_outcome,
         'image_outcome': image_user.image_outcome,
+        'double_used': image_user.double_used,
+        'score': score
+    }
+    return HttpResponse(json.dumps(out))
+
+
+def record_outcome_acc(request):
+    username = request.POST.get('username')
+    image_id = int(request.POST.get('image_id'))
+    captions_used = int(request.POST.get('captions_used'))
+    double_used = int(request.POST.get('double_used'))
+
+    caption_type = request.POST.get('caption_type')
+    caption_image_id = int(request.POST.get('caption_image_id'))
+    caption_outcome = (caption_image_id == image_id)
+
+    try:
+        user = models.User.objects.get(username=username)
+    except models.User.DoesNotExist:
+        # raise Http404('Somethingg went wrong. Contact admin.')
+        # TODO: change back once leaderboard is built out on client-side
+        user = models.User(username=username)
+        user.save()
+    image_user = models.ImageUser_Acc(username=username, image_id=image_id, captions_used=captions_used, caption_outcome=caption_outcome, double_used=double_used)
+    image_user.save()
+    score = update_score_helper(username, int(caption_type), None, None, caption_outcome)
+    out = {
+        'username': image_user.username,
+        'image_id': image_user.image_id,
+        'captions_used': image_user.captions_used,
+        'caption_outcome': image_user.caption_outcome,
         'double_used': image_user.double_used,
         'score': score
     }
