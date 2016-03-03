@@ -15,3 +15,11 @@ class ImageUser(models.Model):
     image_outcome = models.BooleanField(blank=False, default=False)
     caption_outcome = models.BooleanField(blank=False, default=False)
     double_used = models.IntegerField(default=0, blank=False)
+
+
+class ImageUser_Acc(models.Model):
+    image_id = models.IntegerField(blank=False, db_index=True)
+    username = models.CharField(max_length=30, blank=False, db_index=True)
+    captions_used = models.IntegerField(blank=False)
+    caption_outcome = models.BooleanField(blank=False, default=False)
+    double_used = models.IntegerField(default=0, blank=False)

@@ -13,6 +13,7 @@ urlpatterns = [
     url(r'^updatescore/(?P<username>\w{0,50})$', views.update_score, name='updatescore'),
     url(r'^leaderboard/$', views.get_leaderboard, name='leaderboard'),
     url(r'^recordoutcome$', views.record_outcome, name='recordoutcome'),
+    url(r'^recordoutcome_acc$', views.record_outcome_acc, name='recordoutcome_acc'),
     url(r'^getnextuser/$', views.get_next_user_num, name='getnextuser'),
     url(r'^getfixedset/$', views.get_fixed_image_set, name='getfixedset'),
 ]
