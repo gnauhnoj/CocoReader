@@ -89,10 +89,13 @@ def get_random_ocr(request):
 def get_survey_options(request, img_id):
     img_id = int(img_id)
     results = []
+    avoid = []
 
     # good caption
     good_caps = list(captions.find({'image_id': img_id}, {'caption': 1, 'image_id': 1, 'id': 1}))
-    results.append((get_random_caption(good_caps), 2))
+    g_ = get_random_caption(good_caps)
+    avoid.append(g_)
+    results.append((g_, 2))
 
     # get captions
     cats = anns.find({'image_id': img_id}, {'category_id': 1})
@@ -105,13 +108,18 @@ def get_survey_options(request, img_id):
     img_pool = [set([cat['image_id'] for cat in list(anns.find({'category_id': cat}, {'image_id': 1}))]) for cat in sample_cats]
     img_int = list(set.intersection(*img_pool))
     similar_caps_i = choice(img_int)
+
+    # TODO: just get a different caption (even if same image)
     similar_caps = list(captions.find({'image_id': similar_caps_i}, {'caption': 1, 'image_id': 1, 'id': 1}))
-    results.append((get_random_caption(similar_caps), 1))
+    s_ = get_random_caption(similar_caps, avoid)
+    avoid.append(s_)
+    results.append((s_, 1))
 
     # bad caption
     bad_cap_i = choice(list(anns.find({'category_id': {'$nin': cats}}, {'image_id': 1})))['image_id']
     bad_caps = list(captions.find({'image_id': bad_cap_i}, {'caption': 1, 'image_id': 1, 'id': 1}))
-    results.append((get_random_caption(bad_caps), 0))
+    b_ = get_random_caption(bad_caps, avoid)
+    results.append((b_, 0))
     shuffle(results)
 
     # order is [good, similar, bad]
