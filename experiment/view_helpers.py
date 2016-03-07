@@ -53,8 +53,11 @@ def build_img_dict(img_id, anns, ocr, images, categories):
     return img
 
 
-def get_random_caption(caps):
+def get_random_caption(caps, avoid=None):
     single_cap = choice(caps)
+    if avoid is not None:
+        while single_cap in avoid:
+            single_cap = choice(caps)
     temp = {}
     temp['image_id'] = single_cap['image_id']
     temp['caption'] = single_cap['caption']
