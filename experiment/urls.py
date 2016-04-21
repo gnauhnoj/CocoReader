@@ -15,5 +15,5 @@ urlpatterns = [
     url(r'^recordoutcome$', views.record_outcome, name='recordoutcome'),
     url(r'^recordoutcome_acc$', views.record_outcome_acc, name='recordoutcome_acc'),
     url(r'^getnextuser/$', views.get_next_user_num, name='getnextuser'),
-    url(r'^getfixedset/$', views.get_fixed_image_set, name='getfixedset'),
+    url(r'^getimg/(?P<img_id>\w{0,50})/$', views.get_img, name='getimg'),
 ]
