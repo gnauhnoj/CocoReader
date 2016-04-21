@@ -33,16 +33,10 @@ def annotations(request):
     return HttpResponse(a)
 
 
-def get_fixed_image_set(request):
-    FIXED_IMG_IDS = [42492, 95474, 439427, 103035, 323515,
-                     14297, 333440, 409042, 340478, 205811]
-    imgs_out = []
-
-    for iid in FIXED_IMG_IDS:
-        img = build_img_dict(iid, anns, ocr, images, categories)
-        imgs_out.append(img)
-
-    return HttpResponse(json.dumps(imgs_out))
+def get_img(request, img_id):
+    iid = int(img_id)
+    img_out = build_img_dict(iid, anns, ocr, images, categories)
+    return HttpResponse(json.dumps(img_out))
 
 
 def get_random_image(request):
